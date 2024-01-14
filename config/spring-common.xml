@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:configuration.properties</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+
+		<property name="url" value="jdbc:mysql://localhost:3306/no153_ssmyyblglxthsg7686B4?useUnicode=yes&amp;characterEncoding=UTF8" />
+
+		<property name="username" value="root" />
+		<property name="password" value="123456" />
+	</bean>
+
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+	</bean>
+
+	<context:component-scan base-package="com" />
+
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.project.mapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+
+
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+<!-- 配置事务的通用属性 -->
+   <!--  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+    <tx:method name="add*" propagation="REQUIRED"/>
+    <tx:method name="update*" propagation="REQUIRED"/>
+    <tx:method name="delete*" propagation="REQUIRED"/>
+    <tx:method name="*" propagation="REQUIRED" read-only="true"></tx:method>
+    </tx:attributes>
+    </tx:advice> -->
+    <!-- 配置切点 -->
+    <!-- <aop:config>
+    <aop:pointcut expression="execution(* com.service.impl.*.*(..))" id="mycut"/>
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="mycut"/>
+    </aop:config> -->
+    
+  
+ 
+   <!-- 支持上传文件 -->  
+  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/> 
+    
+
+	<tx:annotation-driven transaction-manager="txManager" />
+
+</beans>
